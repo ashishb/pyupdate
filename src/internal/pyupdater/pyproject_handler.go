@@ -26,28 +26,39 @@ func getPyProjectTomlData(pyprojectPath string) ([]byte, error) {
 	return data, nil
 }
 
-func removeDependenciesFromTomlFile(data []byte, pyprojectPath string) error {
-	var pyProjectToml map[string]any
-	if err := toml.Unmarshal(data, &pyProjectToml); err != nil {
-		return fmt.Errorf("failed to unmarshal pyproject.toml: %w", err)
+func removeDependenciesFromTomlFile(data []byte, deps []string, pyprojectPath string) error {
+	tomlData := string(data)
+	// We cannot use toml.Unmarshal and Marshal here because it changes the formatting of the file.
+	numRemoved := 0
+	for _, dep := range deps {
+		if strings.Count(tomlData, dep) > 1 {
+			return fmt.Errorf("dependency %s appears multiple times in pyproject.toml", dep)
+		}
+
+		if strings.Count(tomlData, dep) == 0 {
+			return fmt.Errorf("dependency %s not found in pyproject.toml", dep)
+		}
+
+		val1 := fmt.Sprintf(`"%s",`, dep)
+		val2 := fmt.Sprintf(`'%s',`, dep)
+		val3 := fmt.Sprintf(`"%s"`, dep)
+		for _, val := range []string{val1, val2, val3} {
+			if strings.Contains(tomlData, val) {
+				tomlData = strings.Replace(tomlData, val, "", 1)
+				numRemoved++
+				break
+			}
+		}
 	}
 
-	if project, ok := pyProjectToml["project"].(map[string]any); ok {
-		log.Info().Msg("Removing main dependencies from pyproject.toml")
-		delete(project, "dependencies")
-	}
-	if depGroups, ok := pyProjectToml["dependency-groups"].(map[string]any); ok {
-		log.Info().Msg("Removing dev dependencies from pyproject.toml")
-		delete(depGroups, "dev")
-	}
-
-	updatedData, err := toml.Marshal(pyProjectToml)
-	if err != nil {
-		return fmt.Errorf("failed to marshal updated pyproject.toml: %w", err)
-	}
-	if err := os.WriteFile(pyprojectPath, updatedData, 0644); err != nil {
+	if err := os.WriteFile(pyprojectPath, []byte(tomlData), 0644); err != nil {
 		return fmt.Errorf("failed to write updated pyproject.toml: %w", err)
 	}
+
+	log.Info().
+		Int("numRemovedDeps", numRemoved).
+		Msg("Removed main + dev dependencies from pyproject.toml")
+
 	return nil
 }
 

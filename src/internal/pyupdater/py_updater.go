@@ -41,6 +41,9 @@ func UpdatePackages(directory string, saveExact bool) error {
 		// Str("firstMainDependency", pyproject.GetMainDependencies()[0]).
 		Msg("Parsed dependencies from pyproject.toml")
 
+	allDepsWithVersion := make([]string, 0, len(pyproject.GetMainDependencies())+len(pyproject.GetDevDependencies()))
+	allDepsWithVersion = append(allDepsWithVersion, pyproject.GetMainDependencies()...)
+	allDepsWithVersion = append(allDepsWithVersion, pyproject.GetDevDependencies()...)
 	mainDeps := withoutVersion(pyproject.GetMainDependencies())
 	devDeps := withoutVersion(pyproject.GetDevDependencies())
 	log.Trace().
@@ -54,7 +57,7 @@ func UpdatePackages(directory string, saveExact bool) error {
 	}
 
 	// Then remove the main and dev dependencies from pyproject.toml
-	if err := removeDependenciesFromTomlFile(data, pyprojectPath); err != nil {
+	if err := removeDependenciesFromTomlFile(data, allDepsWithVersion, pyprojectPath); err != nil {
 		return err
 	}
 
