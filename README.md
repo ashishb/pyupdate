@@ -1,5 +1,12 @@
 # pyupdate
 
+[![Lint GitHub Actions](https://github.com/ashishb/pyupdate/actions/workflows/lint-github-actions.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/lint-github-actions.yaml)
+[![Lint YAML](https://github.com/ashishb/pyupdate/actions/workflows/lint-yaml.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/lint-yaml.yaml)
+[![Lint Markdown](https://github.com/ashishb/pyupdate/actions/workflows/lint-markdown.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/lint-markdown.yaml)
+
+[![Lint Go](https://github.com/ashishb/pyupdate/actions/workflows/lint-go.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/lint-go.yaml)
+[![Validate Go code formatting](https://github.com/ashishb/pyupdate/actions/workflows/format-go.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/format-go.yaml)
+
 A project for updating the dependencies in `pyproject.toml` to the latest version.
 
 - [x] Support `uv`
