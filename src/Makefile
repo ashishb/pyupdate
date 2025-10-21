@@ -1,3 +1,9 @@
+lint:
+	golangci-lint run
+
+format:
+	golangci-lint run --fix
+
 build:
 	go build -o bin/pyupdate cmd/pyupdate/main.go
 
