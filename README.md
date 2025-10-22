@@ -7,7 +7,7 @@
 [![Lint Go](https://github.com/ashishb/pyupdate/actions/workflows/lint-go.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/lint-go.yaml)
 [![Validate Go code formatting](https://github.com/ashishb/pyupdate/actions/workflows/format-go.yaml/badge.svg)](https://github.com/ashishb/pyupdate/actions/workflows/format-go.yaml)
 
-A project for updating the dependencies in `pyproject.toml` to the latest version.
+A project for updating the dependencies in `pyproject.toml` to their latest versions.
 
 - [x] Support `uv`
 - [x] Update main dependencies
