@@ -15,7 +15,7 @@ A project for updating the dependencies in `pyproject.toml` to their latest vers
 - [ ] Support `poetry`
 
 ```bash
-pyupdate is a command-line tool that helps you update Python packages in your environment.
+pyupdate is a command-line tool that helps you update packages in your Python project.
 
 Usage:
   pyupdate [flags]

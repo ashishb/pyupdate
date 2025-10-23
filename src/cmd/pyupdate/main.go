@@ -12,7 +12,7 @@ func main() {
 	var rootCmd = &cobra.Command{
 		Use:   "pyupdate",
 		Short: "A tool to update Python packages",
-		Long:  "pyupdate is a command-line tool that helps you update Python packages in your environment.",
+		Long:  "pyupdate is a command-line tool that helps you update packages in your Python project",
 	}
 
 	dirPath := rootCmd.PersistentFlags().StringP("directory", "d", ".", "Path to directory containing pyproject.toml")
