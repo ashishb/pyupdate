@@ -23,7 +23,7 @@ $ go run github.com/ashishb/pyupdate/cmd/pyupdate
 ...
 ```
 
-or download the binaries for your OS from the releases page.
+or download the binaries for your OS from the [releases](https://github.com/ashishb/pyupdate/releases) page.
 
 ## Usage
 
