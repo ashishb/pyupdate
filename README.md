@@ -14,6 +14,19 @@ A project for updating the dependencies in `pyproject.toml` to their latest vers
 - [x] Update dev dependencies
 - [ ] Support `poetry`
 
+## Installation
+
+Either use
+
+```
+$ go run github.com/ashishb/pyupdate/cmd/pyupdate
+...
+```
+
+or download the binaries for your OS from the releases page.
+
+## Usage
+
 ```bash
 pyupdate is a command-line tool that helps you update packages in your Python project.
 
