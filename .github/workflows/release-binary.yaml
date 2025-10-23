@@ -33,7 +33,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: "src/pyupdate/go.mod"
+          go-version-file: "src/go.mod"
           cache: false  # Disable caching to avoid cache poisoning
 
       - name: Read version name
