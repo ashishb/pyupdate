@@ -31,7 +31,7 @@ func removeDependenciesFromTomlFile(data []byte, deps []string, pyprojectPath st
 	// We cannot use toml.Unmarshal and Marshal here because it changes the formatting of the file.
 	numRemoved := 0
 	for _, dep := range deps {
-		if strings.Count(tomlData, dep) > 1 {
+		if strings.Count(tomlData, `"`+dep+`"`) > 1 && strings.Count(tomlData, `'`+dep+`'`) > 1 {
 			return fmt.Errorf("dependency %s appears multiple times in pyproject.toml", dep)
 		}
 
@@ -86,7 +86,7 @@ func withoutVersion(deps []string) []string {
 	return result
 }
 
-func addUpdatedDeps(directory string, mainDeps []string, devDeps []string, saveExact bool) error {
+func addUpdatedDeps(directory string, mainDeps []string, devDeps []string, optionalDeps map[string][]string, saveExact bool) error {
 	if len(mainDeps) > 0 {
 		log.Info().
 			Int("numMainDeps", len(mainDeps)).
@@ -106,6 +106,16 @@ func addUpdatedDeps(directory string, mainDeps []string, devDeps []string, saveE
 			return fmt.Errorf("failed to add dev dependencies: %w", err)
 		}
 		log.Info().Msg("Dev dependencies added successfully")
+	}
+
+	if len(optionalDeps) > 0 {
+		log.Info().
+			Int("numOptionalDeps", len(optionalDeps)).
+			Msg("Adding optional dependencies back using 'uv add --optional'")
+		if err := addOptionalDeps(directory, optionalDeps); err != nil {
+			return fmt.Errorf("failed to add optional dependencies: %w", err)
+		}
+		log.Info().Msg("Optional dependencies added successfully")
 	}
 
 	if saveExact {
@@ -162,4 +172,15 @@ func addDevDeps(directory string, deps []string) error {
 	cmd := []string{"uv", "add", "--dev", "--directory", directory}
 	cmd = append(cmd, deps...)
 	return executeCommand(cmd)
+}
+
+func addOptionalDeps(directory string, deps map[string][]string) error {
+	for group, groupDeps := range deps {
+		cmd := []string{"uv", "add", "--optional", group, "--directory", directory}
+		cmd = append(cmd, groupDeps...)
+		if err := executeCommand(cmd); err != nil {
+			return err
+		}
+	}
+	return nil
 }
