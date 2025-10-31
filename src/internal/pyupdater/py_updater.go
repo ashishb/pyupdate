@@ -9,7 +9,8 @@ import (
 type _PyProjectToml struct {
 	// Relevant fields are "project.dependencies" and "dependency-groups.dev"
 	Project struct {
-		Dependencies []string `toml:"dependencies"`
+		Dependencies         []string            `toml:"dependencies"`
+		OptionalDependencies map[string][]string `toml:"optional-dependencies"`
 	}
 	DependencyGroups map[string][]string `toml:"dependency-groups"`
 }
@@ -20,6 +21,10 @@ func (p _PyProjectToml) GetMainDependencies() []string {
 
 func (p _PyProjectToml) GetDevDependencies() []string {
 	return p.DependencyGroups["dev"]
+}
+
+func (p _PyProjectToml) GetOptionalDependencies() map[string][]string {
+	return p.Project.OptionalDependencies
 }
 
 func UpdatePackages(directory string, saveExact bool) error {
@@ -44,11 +49,20 @@ func UpdatePackages(directory string, saveExact bool) error {
 	allDepsWithVersion := make([]string, 0, len(pyproject.GetMainDependencies())+len(pyproject.GetDevDependencies()))
 	allDepsWithVersion = append(allDepsWithVersion, pyproject.GetMainDependencies()...)
 	allDepsWithVersion = append(allDepsWithVersion, pyproject.GetDevDependencies()...)
+	for _, deps := range pyproject.GetOptionalDependencies() {
+		allDepsWithVersion = append(allDepsWithVersion, deps...)
+	}
+
 	mainDeps := withoutVersion(pyproject.GetMainDependencies())
 	devDeps := withoutVersion(pyproject.GetDevDependencies())
+	optionalDeps := pyproject.GetOptionalDependencies()
+	for key, deps := range optionalDeps {
+		optionalDeps[key] = withoutVersion(deps)
+	}
 	log.Trace().
 		Strs("mainDependencies", mainDeps).
 		Strs("devDependencies", devDeps).
+		Any("optionalDependencies", optionalDeps).
 		Msg("Dependencies without version specifiers")
 
 	// Now, remove lock file
@@ -62,7 +76,7 @@ func UpdatePackages(directory string, saveExact bool) error {
 	}
 
 	// Now, add dependencies back using "uv add" and "uv add --dev"
-	if err := addUpdatedDeps(directory, mainDeps, devDeps, saveExact); err != nil {
+	if err := addUpdatedDeps(directory, mainDeps, devDeps, optionalDeps, saveExact); err != nil {
 		return fmt.Errorf("failed to add updated dependencies: %w", err)
 	}
 
