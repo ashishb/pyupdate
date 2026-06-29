@@ -73,15 +73,23 @@ func parsePyProjectToml(data []byte) (*_PyProjectToml, error) {
 func withoutVersion(deps []string) []string {
 	result := make([]string, 0, len(deps))
 	for _, dep := range deps {
+		// Separate the package specifier from any platform/environment markers (e.g. "; platform_system != 'Windows'")
+		packagePart := dep
+		markerPart := ""
+		if idx := strings.Index(dep, ";"); idx != -1 {
+			packagePart = strings.TrimRight(dep[:idx], " ")
+			markerPart = dep[idx:]
+		}
+
 		// Split at the first occurrence of any version specifier
-		splitIndex := len(dep)
-		for i, char := range dep {
+		splitIndex := len(packagePart)
+		for i, char := range packagePart {
 			if char == '=' || char == '<' || char == '>' || char == '!' || char == '~' {
 				splitIndex = i
 				break
 			}
 		}
-		result = append(result, dep[:splitIndex])
+		result = append(result, packagePart[:splitIndex]+markerPart)
 	}
 	return result
 }
